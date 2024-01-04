@@ -1,0 +1,4 @@
+*prayertime.nvim.txt*      For Neovim >= 0.7.0       Last change: 2024 January
+
+==============================================================================
+Table of Contents                          *prayertime.nvim-table-of-contents*

@@ -16,7 +16,7 @@ function closePrayertimePopupSoon()
     end, 1000)
 end
 
-function ShowPrayerTimePoup(praytimeList, cb)
+local function showPrayerTimePoup(praytimeList, cb)
     local height = 10
     local width = 30
     local borderchars = {"─", "│", "─", "│", "╭", "╮", "╯", "╰"}
@@ -73,7 +73,11 @@ function M.get_prayer_times(opts)
         "Maghrib \t\t" .. times[6],
         "Isha \t\t\t" .. times[7]
     }
-    ShowPrayerTimePoup(prayer_times, nil)
+    showPrayerTimePoup(prayer_times, nil)
+end
+
+M.showPrayerPopup = function()
+    print('Pyayer popup show is called')
 end
 
 function M.setup(opts)
