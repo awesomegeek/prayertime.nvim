@@ -12,11 +12,13 @@ function ClosePrayertimePopup()
   end
 end
 
+
 function ClosePrayertimePopupSoon()
   vim.defer_fn(function()
     ClosePrayertimePopup()
   end, 1000)
 end
+
 
 local function displayInPopup(praytimeList, cb)
   local height = 10
@@ -52,61 +54,49 @@ local function displayInPopup(praytimeList, cb)
 end
 
 
-local function getPrayerTime(opts)
-  opts = opts or {}
-  if opts.city then
-    local city = opts.city or "Cyberjaya"
-    local coords = opts.coords or { "2.920162986", "101.652997388" }
-    local timestamp = opts.date or os.date("*t")
-    local method = opts.method or 2
+M.getPrayerTimes = function(timestamp)
+  local opts = M.confs
 
-    local prayTime = require('prayertime._prayertime'):new();
-    prayTime:setCalcMethod(method);
-    local times = prayTime:getPrayerTimes(timestamp, coords[1], coords[2]);
-    -- print('Fajr' , times[1]);
-    local prayer_times = {
-      string.format("Prayertime for %d/%d/%d", timestamp.year, timestamp.month, timestamp.day),
-      "" .. city,
-      "-------------------",
-      "Imsak \t\t\t" .. times[8],
-      "Fajr \t\t\t" .. times[1],
-      "Sunrise \t\t" .. times[2],
-      "Dhuhr \t\t\t" .. times[3],
-      "Asr \t\t\t\t" .. times[4],
-      "Sunset \t\t" .. times[5],
-      "Maghrib \t\t" .. times[6],
-      "Isha \t\t\t" .. times[7]
-    }
-    return prayer_times
-  else
-    print("Please set cityname and coordinates")
-    return "Please set city and coordinates"
-  end
+  local coords = opts.coords or { "2.920162986", "101.652997388" }
+  local timestamp = timestamp or os.date("*t")
+  local method = opts.method or 3
+  local prayTime = require('prayertime._prayertime'):new();
+  prayTime:setCalcMethod(method);
+  return prayTime:getPrayerTimes(timestamp, coords[1], coords[2]);
 end
+
+
+M.formatPrayerTimes = function(times, timestamp)
+  local opts = M.confs
+  local city = opts.city or "Cyberjaya"
+  local prayer_times = {
+    string.format("Prayertime for %d/%d/%d", timestamp.year, timestamp.month, timestamp.day),
+    "" .. city,
+    "-------------------",
+    "Imsak \t\t\t" .. times[8],
+    "Fajr \t\t\t" .. times[1],
+    "Sunrise \t\t" .. times[2],
+    "Dhuhr \t\t\t" .. times[3],
+    "Asr \t\t\t\t" .. times[4],
+    "Sunset \t\t" .. times[5],
+    "Maghrib \t\t" .. times[6],
+    "Isha \t\t\t" .. times[7]
+  }
+  return prayer_times
+end
+
 
 M.showPrayerPopup = function()
-  displayInPopup(getPrayerTime(M.confs), nil)
+  local for_date = os.date("*t")
+  local times = M.getPrayerTimes(for_date)
+  displayInPopup(M.formatPrayerTimes(times, for_date), nil)
 end
 
-
-M.hello = function()
-  print(M.confs.city)
-end
 
 function M.setup(opts)
   opts = opts or {}
   M.confs = opts
-  --   vim.keymap.set("n", "<Leader>h", function()
-  --     if opts.city then
-  --       M.get_prayer_times({
-  --         city = opts.city,
-  --         coords = opts.coords,
-  --         method = opts.method
-  --       })
-  --     else
-  --       print("Please set cityname and coordinates")
-  --     end
-  --   end)
 end
+
 
 return M
