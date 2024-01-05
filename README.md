@@ -32,7 +32,10 @@ Calculations methods
    opts = {
       city = "Cyberjaya",
       coords = { "2.920162986", "101.652997388" },
-      method = 2, -- Islamic Society of North America (ISNA)
-   }
+      method = 3, -- MWL
+   },
+    keys = {
+      { "<leader>pt", "<cmd>SalatPopup<cr>", desc = "Show Prayer Time Popup" }
+   },
 },
 ```
