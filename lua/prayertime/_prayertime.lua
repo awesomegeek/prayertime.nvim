@@ -29,7 +29,7 @@ PrayTime.Egypt      = 5    -- Egyptian General Authority of Survey
 PrayTime.Custom     = 6    -- Custom Setting
 PrayTime.Tehran     = 7    -- Institute of Geophysics, University of Tehran
 PrayTime.Bahrain    = 8    -- According to Al-Hadi Calender
-local Imsak_offset        = 8.3  -- Change this im minutes according to school/method
+local Imsak_offset  = 8.3  -- Change this im minutes according to school/method
 
 
 -- Juristic Methods
@@ -263,7 +263,10 @@ end
 function PrayTime:computeTimes(times)
     local t = self:dayPortion(times)
 
-    local Imsak = self:computeTime(180 - self.methodParams[self.calcMethod][1], t[1] + Imsak_offset)
+    -- local Imsak = self:computeTime(180 - self.methodParams[self.calcMethod][1], t[1] + Imsak_offset)
+    -- TODO: Need to confirm this. I think need to minus the time for IMSAK
+    local Imsak = self:computeTime(180 - self.methodParams[self.calcMethod][1], t[1] - Imsak_offset)
+
     local Fajr = self:computeTime(180 - self.methodParams[self.calcMethod][1], t[1])
     local Sunrise = self:computeTime(180 - 0.833, t[2])
     local Dhuhr = self:computeMidDay(t[3])
