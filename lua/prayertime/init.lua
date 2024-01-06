@@ -1,6 +1,16 @@
 local M = {}
 
 local popup = require "plenary.popup"
+local prayerNames = {
+        'Fajr',
+        'Sunrise',
+        'Dhuhr',
+        'Asr',
+        'Sunset',
+        'Maghrib',
+        'Isha',
+        -- 'Imsak'
+}
 
 local Win_id
 M.confs = {}
@@ -54,15 +64,58 @@ local function displayInPopup(praytimeList, cb)
 end
 
 
-M.getPrayerTimes = function(timestamp)
+M.getPrayerTimes = function(timestamp, timeformat)
   local opts = M.confs
+  timeformat = timeformat or 1 -- 0 -> 24, 1 -> 12hr, 2 -> float
 
-  local coords = opts.coords or { "2.920162986", "101.652997388" }
+  -- local coords = opts.coords or { "2.920162986", "101.652997388" }
+  if not opts.coords then
+    print("Prayertime: Coords need to set")
+  end
+  local coords = opts.coords
   local timestamp = timestamp or os.date("*t")
   local method = opts.method or 3
-  local prayTime = require('prayertime._prayertime'):new();
-  prayTime:setCalcMethod(method);
-  return prayTime:getPrayerTimes(timestamp, coords[1], coords[2]);
+  local prayTime = require('prayertime._prayertime'):new()
+  prayTime:setCalcMethod(method)
+  prayTime:setTimeFormat(timeformat)
+  return prayTime:getPrayerTimes(timestamp, coords[1], coords[2])
+end
+
+local function getHourFloat(hour, minutes)
+  return hour + minutes / 60
+end
+
+
+M.getNowAndNext = function()
+  local now = os.date("*t")
+  local nowFloat = getHourFloat(now.hour, now.min)
+  -- local nowFloat = 14.43
+  local ptimes = M.getPrayerTimes(now, 2)  -- get float times
+  local ftimes = M.getPrayerTimes(now, 1)
+
+  local currentIndex = 0
+  local nextIndex = 0
+  -- print("Now is " .. nowFloat)
+  for i = 1, #ptimes - 1 do
+    -- print(ptimes[i])
+    if nowFloat > ptimes[i] and nowFloat < ptimes[i + 1] then
+      print(ptimes[i])
+      currentIndex = i
+      nextIndex = i + 1
+      break
+    end
+  end
+  if currentIndex == 0 then
+    currentIndex = 7
+    nextIndex = 1
+  end
+  -- print('Current prayer time index ' .. currentIndex)
+  local data = {}
+  data["prev"] = {prayerNames[currentIndex], ftimes[currentIndex]}
+  data["next"] = {prayerNames[nextIndex], ftimes[nextIndex]}
+  -- print(data["prev"][1])
+  -- print(data["next"][1])
+  return data
 end
 
 
@@ -82,6 +135,7 @@ M.formatPrayerTimes = function(times, timestamp)
     "Maghrib \t\t" .. times[6],
     "Isha \t\t\t" .. times[7]
   }
+  M.getNowAndNext()
   return prayer_times
 end
 
