@@ -2,14 +2,14 @@ local M = {}
 
 local popup = require "plenary.popup"
 local prayerNames = {
-        'Fajr',
-        'Sunrise',
-        'Dhuhr',
-        'Asr',
-        'Sunset',
-        'Maghrib',
-        'Isha',
-        -- 'Imsak'
+  'Fajr',
+  'Sunrise',
+  'Dhuhr',
+  'Asr',
+  'Sunset',
+  'Maghrib',
+  'Isha',
+  -- 'Imsak'
 }
 
 local Win_id
@@ -22,13 +22,11 @@ function ClosePrayertimePopup()
   end
 end
 
-
 function ClosePrayertimePopupSoon()
   vim.defer_fn(function()
     ClosePrayertimePopup()
   end, 1000)
 end
-
 
 local function displayInPopup(praytimeList, cb)
   local height = 10
@@ -49,8 +47,6 @@ local function displayInPopup(praytimeList, cb)
     enter = true
   })
   local bufnr = vim.api.nvim_win_get_buf(Win_id)
-  --   vim.api.nvim_buf_set_option(bufnr, "readonly", true)
-  --   vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "q", "<cmd>lua ClosePrayertimePopup()<CR>", {
     silent = false
   })
@@ -68,7 +64,6 @@ M.getPrayerTimes = function(timestamp, timeformat)
   local opts = M.confs
   timeformat = timeformat or 1 -- 0 -> 24, 1 -> 12hr, 2 -> float
 
-  -- local coords = opts.coords or { "2.920162986", "101.652997388" }
   if not opts.coords then
     print("Prayertime: Coords need to set")
   end
@@ -88,18 +83,15 @@ end
 
 M.getNowAndNext = function()
   local now = os.date("*t")
-  local nowFloat = getHourFloat(now.hour, now.min)
-  -- local nowFloat = 14.43
-  local ptimes = M.getPrayerTimes(now, 2)  -- get float times
+  -- local nowFloat = getHourFloat(now.hour, now.min)
+  local nowFloat = 14.43
+  local ptimes = M.getPrayerTimes(now, 2) -- get float times
   local ftimes = M.getPrayerTimes(now, 1)
 
   local currentIndex = 0
   local nextIndex = 0
-  -- print("Now is " .. nowFloat)
   for i = 1, #ptimes - 1 do
-    -- print(ptimes[i])
     if nowFloat > ptimes[i] and nowFloat < ptimes[i + 1] then
-      print(ptimes[i])
       currentIndex = i
       nextIndex = i + 1
       break
@@ -109,12 +101,9 @@ M.getNowAndNext = function()
     currentIndex = 7
     nextIndex = 1
   end
-  -- print('Current prayer time index ' .. currentIndex)
   local data = {}
-  data["prev"] = {prayerNames[currentIndex], ftimes[currentIndex]}
-  data["next"] = {prayerNames[nextIndex], ftimes[nextIndex]}
-  -- print(data["prev"][1])
-  -- print(data["next"][1])
+  data["prev"] = { prayerNames[currentIndex], ftimes[currentIndex] }
+  data["next"] = { prayerNames[nextIndex], ftimes[nextIndex] }
   return data
 end
 
@@ -151,6 +140,5 @@ function M.setup(opts)
   opts = opts or {}
   M.confs = opts
 end
-
 
 return M

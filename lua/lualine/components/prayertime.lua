@@ -10,13 +10,10 @@ end
 
 function M:update_status()
   -- seem like update_status method refresh every seconds
-  local text = ""
   local current_minute = os.date("*t").min
-  local updated = 'false'
   -- only refresh the calculation each minute
   if self.last_minute ~= current_minute then
     self.last_minute = current_minute
-    updated = 'true'
     -- calculate value here
     local now_next = require('prayertime').getNowAndNext()
     self.now_next_info = "" .. now_next["next"][1] .. " " .. now_next["next"][2]
